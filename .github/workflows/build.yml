@@ -50,6 +50,13 @@ jobs:
         run: |
           cmake --preset=${{ matrix.platform }}-rel -S ./ -B ./build -DBUILD_GNURADIO_BLOCKS=OFF
 
+      - name: Debug gstreamer version
+        if: ${{ matrix.platform == 'windows' }}
+        shell: pwsh
+        run: |
+          Get-ChildItem build/vcpkg_installed/vcpkg/info -Filter "gstreamer_*" | Select-Object Name
+          Get-Content build/vcpkg_installed/x64-windows/include/gstreamer-1.0/gst/video/gstvideodmabufpool.h | Select-Object -Skip 35 -First 30
+
       - name: Build
         run: |
           cmake --build ./build --config=Release
@@ -70,4 +77,3 @@ jobs:
           include-hidden-files: true
           path: |
             install/
-
