@@ -37,8 +37,7 @@ jobs:
       - name: Install Windows Prerequisites
         if: ${{ matrix.platform == 'windows' }}
         run: |
-          pip3 install opencv-python pytest gnuradio
-          vcpkg install gnuradio:x64-windows
+          pip3 install opencv-python pytest
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -49,7 +48,7 @@ jobs:
       - name: Configure project
         run: |
           cmake --preset=${{ matrix.platform }}-rel -S ./ -B ./build -DBUILD_GNURADIO_BLOCKS=ON
-          
+
       - name: Patch GStreamer dmabuf header
         if: ${{ matrix.platform == 'windows' }}
         shell: pwsh
