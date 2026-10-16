@@ -50,6 +50,17 @@ jobs:
         run: |
           cmake --preset=${{ matrix.platform }}-rel -S ./ -B ./build -DBUILD_GNURADIO_BLOCKS=OFF
 
+      - name: Patch GStreamer dmabuf header
+        if: ${{ matrix.platform == 'windows' }}
+        shell: pwsh
+        run: |
+          $h = "build/vcpkg_installed/x64-windows/include/gstreamer-1.0/gst/video/gstvideodmabufpool.h"
+          $t = Get-Content $h -Raw
+          $n = $t -replace 'GstVideoBufferPool\)', 'GstBufferPool)'
+          if ($n -eq $t) { Write-Error "Pattern not found"; Get-Content $h | Select-Object -First 70; exit 1 }
+          Set-Content $h $n -NoNewline
+          Select-String -Path $h -Pattern 'G_DECLARE_FINAL_TYPE' -Context 0,2
+
       - name: Debug gstreamer version
         if: ${{ matrix.platform == 'windows' }}
         shell: pwsh
