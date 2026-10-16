@@ -1,4 +1,4 @@
-name: Build Aanalog TV Tools
+name: Build Analog TV Tools
 run-name: Build No.${{ github.run_number }} on behalf of ${{ github.actor }}
 
 on:
@@ -31,14 +31,14 @@ jobs:
           sudo apt-get --yes install liburing-dev libx11-dev libxft-dev libtool bison gperf libgles2-mesa-dev libxext-dev libxrandr-dev libxi-dev 
           sudo apt-get --yes install libxcursor-dev libxdamage-dev libxinerama-dev libltdl-dev libxtst-dev doxygen gnuradio gnuradio-dev 
           sudo apt-get --yes install python3-opencv python3-pytest flex nasm
-          #sudo apt-get --yes install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
           sudo apt-get --yes install libgstreamer* libgstrtspserver*
           sudo apt-get --yes install libltdl-dev
 
       - name: Install Windows Prerequisites
         if: ${{ matrix.platform == 'windows' }}
         run: |
-          pip3 install opencv-python pytest
+          pip3 install opencv-python pytest gnuradio
+          vcpkg install gnuradio:x64-windows
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -48,8 +48,8 @@ jobs:
 
       - name: Configure project
         run: |
-          cmake --preset=${{ matrix.platform }}-rel -S ./ -B ./build -DBUILD_GNURADIO_BLOCKS=OFF
-
+          cmake --preset=${{ matrix.platform }}-rel -S ./ -B ./build -DBUILD_GNURADIO_BLOCKS=ON
+          
       - name: Patch GStreamer dmabuf header
         if: ${{ matrix.platform == 'windows' }}
         shell: pwsh
@@ -88,4 +88,3 @@ jobs:
           include-hidden-files: true
           path: |
             install/
-            
